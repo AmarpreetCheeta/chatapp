@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+</head>
+<body>
+    <h2>Room: {{ room_name }}</h2>
+    <div id="chat-box"></div>
+    <input type="text" id="message-input" placeholder="Type a message..." />
+    <button id="send-button">Send</button>
+
+    <script>
+        const roomName = "{{ room_name }}";
+        const ws = new WebSocket(`ws://${window.location.host}/ws/chat/${roomName}/`);
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<p><strong>${data.username}:</strong> ${data.message}</p>`;
+        };
+
+        document.getElementById("send-button").onclick = function() {
+            const messageInput = document.getElementById("message-input");
+            ws.send(JSON.stringify({
+                "message": messageInput.value,
+                "username": "Guest"
+            }));
+            messageInput.value = "";
+        };
+    </script>
+</body>
+</html>
